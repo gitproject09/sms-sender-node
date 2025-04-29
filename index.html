@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bulk SMS Sender</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    .container { max-width: 400px; margin: auto; }
+    input[type="file"] { margin-bottom: 1rem; }
+    button { padding: 0.5rem 1rem; font-size: 16px; cursor: pointer; }
+    .status { margin-top: 1rem; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Upload Excel to Send SMS</h2>
+    <form id="uploadForm">
+      <input type="file" id="fileInput" accept=".xlsx,.xls" required />
+      <br />
+      <button type="submit">Send Messages</button>
+    </form>
+    <div class="status" id="status"></div>
+  </div>
+
+  <script>
+    const uploadForm = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('fileInput');
+    const statusDiv = document.getElementById('status');
+
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!fileInput.files.length) {
+        alert('Please select a file first.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+
+      statusDiv.textContent = 'Sending... Please wait.';
+
+      try {
+        const response = await fetch('http://localhost:3000/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          statusDiv.textContent = 'Messages sent successfully!';
+        } else {
+          statusDiv.textContent = `Error: ${result.error}`;
+        }
+      } catch (error) {
+        statusDiv.textContent = `Error: ${error.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
